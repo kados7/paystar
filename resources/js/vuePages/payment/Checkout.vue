@@ -42,7 +42,10 @@ function getUserCart(){
         // always executed
     });
 }
-getUserCart()
+
+
+
+
 
 const selectedCart= reactive({info : 0})
 
@@ -92,7 +95,7 @@ function submitNewCart(){
 
 const product = reactive({info:0})
 
-function getProducts(){
+function getProduct(){
     axios.get(`/api/v1/products/${route.params.id}`)
     .then(function (response) {
         // handle success
@@ -108,7 +111,35 @@ function getProducts(){
     });
 }
 
-getProducts()
+const isPurchased = ref(false);
+function isProductPurchased(){
+
+    axios.post(`/api/v1/products/${route.params.id}/isPurchased`,
+    { yes : 'yeees'}, //data
+    {
+    headers: {
+      'Authorization': 'Bearer ' + authStore.token,
+    }
+    })
+    .then(function (response) {
+        console.log(response.data);
+        if(response.data == false){
+            isPurchased.value = true;
+            getUserCart()
+            getProduct()
+        }
+    })
+    .catch(function (error) {
+        // handle error
+        console.log(error);
+    })
+    .finally(function () {
+        // always executed
+    });
+}
+isProductPurchased()
+
+
 
 const bankToken = ref()
 const payment_amount = ref()
@@ -160,8 +191,13 @@ function payment(){
 </script>
 
 <template>
+<div v-if="!isPurchased" class="row p-5">
+    <div class="alert alert-danger" role="alert">
+        شما این محصول را از قبل خریداری کرده اید.
+    </div>
+</div>
 
-<div class="row p-5">
+<div v-else class="row p-5">
     <div class="d-flex flex-row justify-content-start mb-2">
         <button @click="backToProductIndex" class="btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">

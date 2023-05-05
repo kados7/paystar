@@ -9,8 +9,8 @@ class IsFailed extends TransactionCheck
 {
     public function check($response , $transaction , $receipt){
 
-        if(! $response->status == 1){
-            // dd('Failed' , $response->all());
+        // dd('Failed' , $response->all());
+        if(!($response->status == 1) ){
             $transaction->update([
                 'pay_success' => false,
                 'transaction_id' => $response->transaction_id,

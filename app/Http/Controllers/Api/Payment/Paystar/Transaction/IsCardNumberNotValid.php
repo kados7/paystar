@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Payment\Paystar\Transaction;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class IsCardNumberValid extends TransactionCheck
+class IsCardNumberNotValid extends TransactionCheck
 {
     public function check($response , $transaction , $receipt){
 

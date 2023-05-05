@@ -21,7 +21,7 @@ class SaderatPayment implements PaymentStrategy
 
     }
 
-    function verify($amount,$ref_num,$card_number, $tracking_code , $transaction_id) {
+    function verify($verify_data) {
 
     }
 }

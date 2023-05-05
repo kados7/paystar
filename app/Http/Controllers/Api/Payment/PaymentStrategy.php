@@ -9,6 +9,6 @@ interface PaymentStrategy
 {
     public function create($request);
     public function callback($request);
-    public function verify($amount,$ref_num,$card_number, $tracking_code , $transaction_id);
+    public function verify($verify_data);
 
 }

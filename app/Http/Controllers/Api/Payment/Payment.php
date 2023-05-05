@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Payment;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class PaymentStrategy
+class Payment
 {
     private $paymenStrategy;
     public function __construct(PaymentStrategy $paymenStrategy)
@@ -13,8 +13,13 @@ class PaymentStrategy
         $this->paymenStrategy = $paymenStrategy;
     }
 
-    public function createPayment()
+    public function create($data)
     {
-        return $this->paymenStrategy->create('request');
+        return $this->paymenStrategy->create($data);
+    }
+
+    public function callback($data)
+    {
+        return $this->paymenStrategy->callback($data);
     }
 }

@@ -41,7 +41,7 @@ Route::prefix('v1')->name('v1.')->group(function(){
     Route::post('/addUserCart', [ProfileController::class , 'addUserCart'])->middleware('auth:api');
     Route::post('/getUserProducts', [ProfileController::class , 'getUserProducts'])->middleware('auth:api');
 
-    Route::post('/goToPayment', [PaymentController::class , 'startPayment'])->middleware('auth:api');
+    Route::post('/goToPayment', [PaymentController::class , 'goToPayment'])->middleware('auth:api');
     Route::post('/paystare/callback', [PaymentController::class , 'paymentCallback'])->name('paystar.callback');
     Route::get('/transaction/{transaction:transaction_id}', [TransactionController::class , 'show'])->name('transaction.show');
 

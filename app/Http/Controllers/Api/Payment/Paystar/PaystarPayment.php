@@ -17,7 +17,7 @@ class PaystarPayment implements PaymentStrategy
     private $paystarGatewayId = "0yovdk2l6e143";
     private $paystarSignKey = "9A3EC03483556C73714510C507529DF70A1228C83477D1455E0511BD72C5AAB8A6715A414AA48B7C905FCEF45868BD26DA58196EF29C77C194C9F14A4B47456CC6454E9D50B388D6FC5AC91BB08B234A8060FDC85B1CEC32CA036DC907F8A4A635D9CBB9CAA31B42549B8D70B2CE5EDE8274FFB55DABFE92D76BC42D91696FAF";
 
-    public function create(Request $request){
+    public function create($request){
 
         $order =Order::create([
             'user_id' => $request->user()->id,
@@ -71,7 +71,7 @@ class PaystarPayment implements PaymentStrategy
     }
 
 
-    public function callback(Request $request){
+    public function callback($request){
         $transaction = Transaction::where('ref_num',$request->ref_num)->first();
         $receipt = $transaction->id.'.'.Carbon::now()->timestamp.'.'.$transaction->order->user_id;
 
@@ -105,8 +105,14 @@ class PaystarPayment implements PaymentStrategy
                 'receipt' => $receipt,
             ]);
 
-            // return redirect('/payment/transaction/'.$transaction->transaction_id.'/success');
-            return $this->verify($transaction->order->amount , $transaction->ref_num , $transaction->card_number , $transaction->tracking_code,$transaction->transaction_id);
+            $verify_data = [
+                'amount' => $transaction->order->amount ,
+                'ref_num' => $transaction->ref_num ,
+                'card_number' => $transaction->card_number ,
+                'tracking_code' => $transaction->tracking_code,
+                'transaction_id' => $transaction->transaction_id
+            ];
+            return $this->verify($verify_data);
         }
         else{
             $transaction->update([
@@ -115,15 +121,14 @@ class PaystarPayment implements PaymentStrategy
                 'receipt' => $receipt,
             ]);
 
-            $order_id = $transaction->order->id;
             return redirect('/payment/transaction/'.$transaction->transaction_id.'/failed');
         }
     }
 
-    function verify($amount,$ref_num,$card_number, $tracking_code , $transaction_id) {
+    function verify($verify_data) {
 
         // amount#ref_num#card_number#tracking_code
-        $signData=$amount."#".$ref_num."#".$card_number."#".$tracking_code;
+        $signData=$verify_data['amount']."#".$verify_data['ref_num']."#".$verify_data['card_number']."#".$verify_data['tracking_code'];
 
         $sign =hash_hmac('SHA512',$signData,$this->paystarSignKey,false);
 
@@ -131,14 +136,14 @@ class PaystarPayment implements PaymentStrategy
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer '.$this->paystarGatewayId,
         ])->post( $this->paystarVerifyUrl , [
-            'ref_num' => $ref_num,
-            'amount' => $amount,
+            'ref_num' => $verify_data['ref_num'],
+            'amount' => $verify_data['amount'],
             'sign' => $sign,
         ]);
 
 
         $response=json_decode($response);
-        $transaction = Transaction::where('transaction_id',$transaction_id)->first();
+        $transaction = Transaction::where('transaction_id',$verify_data['transaction_id'])->first();
 
         if($response->status == 1){
             // dd('Yes',$response,$transaction,$ref_num, $amount,$card_number, $tracking_code , $transaction_id,$sign,$signData);
@@ -148,11 +153,11 @@ class PaystarPayment implements PaymentStrategy
             $user = $transaction->order->user;
             $product=$transaction->order->product;
             $user->products()->attach($product);
-            return redirect('/payment/transaction/'.$transaction_id.'/success');
+            return redirect('/payment/transaction/'.$verify_data['transaction_id'].'/success');
         }
         else{
             // dd("/payment/transaction/".$transaction_id."/failed");
-            return redirect('/payment/transaction/'.$transaction_id.'/failed');
+            return redirect('/payment/transaction/'.$verify_data['transaction_id'].'/failed');
         }
     }
 }

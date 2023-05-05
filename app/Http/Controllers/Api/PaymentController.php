@@ -10,10 +10,10 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Redirect;
 
 class PaymentController extends Controller
 {
-    public $api = 'test';
     public $paymentCreateUrl = "https://core.paystar.ir/api/pardakht/create";
     public $paymentVerifyUrl = "https://core.paystar.ir/api/pardakht/verify";
     public $gatewayId = "0yovdk2l6e143";
@@ -32,6 +32,7 @@ class PaymentController extends Controller
         $sign =hash_hmac('SHA512',$signData,$this->signKey,false);
         // $cart_number = Cart::find($request->cart_id)->number;
 
+        $cart = Cart::find($request->cart_id);
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer '.$this->gatewayId,
@@ -40,7 +41,7 @@ class PaymentController extends Controller
             'order_id' => $order->id,
             'callback' => route('v1.paystar.callback'),
             'sign' => $sign,
-            // 'card_number' => $cart_number,
+            'card_number' => strval($cart->number)
         ]);
 
         $response=json_decode($response);
@@ -55,17 +56,19 @@ class PaymentController extends Controller
                 'order_id' => $order->id,
                 'ref_num' => $response->data->ref_num,
             ]);
+            return [
+                'code'=> 200,
+                'transaction' => $transaction,
+                'response' => $response,
+            ];
+
         }else {
             return [
                 'code'=> 401,
-                'data' => $response->message,
+                'data' => $response,
             ];
         }
-        return [
-            'code'=> 200,
-            'transaction' => $transaction,
-            'response' => $response,
-        ];
+
     }
 
 
@@ -73,7 +76,27 @@ class PaymentController extends Controller
         $transaction = Transaction::where('ref_num',$request->ref_num)->first();
         $receipt = $transaction->id.'.'.Carbon::now()->timestamp.'.'.$transaction->order->user_id;
 
+
+        $user_submit_cart_number = $transaction->order->cart->number;
+        $cartWithStar = substr( $user_submit_cart_number,0,6)."******".substr( $user_submit_cart_number,12,4);
+
+        if($request->status == 1 && $cartWithStar !== $request->card_number){
+
+            // dd($request->all(), $cartWithStar);
+            $transaction->update([
+                'ref_num' => $request->ref_num,
+                'pay_success' => true,
+                'transaction_id' => $request->transaction_id,
+                'card_number' => $request->card_number,
+                'tracking_code' => $request->tracking_code,
+                'receipt' => $receipt,
+                'verify' => false,
+            ]);
+            return redirect('/payment/transaction/'.$transaction->transaction_id.'/failed/cartNumber');
+
+        }
         if($request->status == 1){
+
             $transaction->update([
                 'ref_num' => $request->ref_num,
                 'pay_success' => true,
@@ -83,10 +106,8 @@ class PaymentController extends Controller
                 'receipt' => $receipt,
             ]);
 
-
-
             // return redirect('/payment/transaction/'.$transaction->transaction_id.'/success');
-            $this->verify($transaction->order->amount , $transaction->ref_num , $transaction->card_number , $transaction->tracking_code,$transaction->transaction_id);
+            return $this->verify($transaction->order->amount , $transaction->ref_num , $transaction->card_number , $transaction->tracking_code,$transaction->transaction_id);
         }
         else{
             $transaction->update([
@@ -106,7 +127,6 @@ class PaymentController extends Controller
         $signData=$amount."#".$ref_num."#".$card_number."#".$tracking_code;
 
         $sign =hash_hmac('SHA512',$signData,$this->signKey,false);
-        // dd($amount, $ref_num, $card_number, $tracking_code , $transaction_id,$sign,$signData);
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
@@ -120,13 +140,19 @@ class PaymentController extends Controller
 
         $response=json_decode($response);
         $transaction = Transaction::where('transaction_id',$transaction_id)->first();
-        // dd($response,$transaction,$ref_num, $amount,$card_number, $tracking_code , $transaction_id,$sign,$signData);
+
         if($response->status == 1){
+            // dd('Yes',$response,$transaction,$ref_num, $amount,$card_number, $tracking_code , $transaction_id,$sign,$signData);
+            $transaction->update([
+                'verify' =>true
+            ]);
             $user = $transaction->order->user;
             $product=$transaction->order->product;
             $user->products()->attach($product);
             return redirect('/payment/transaction/'.$transaction_id.'/success');
-        }else{
+        }
+        else{
+            // dd("/payment/transaction/".$transaction_id."/failed");
             return redirect('/payment/transaction/'.$transaction_id.'/failed');
         }
     }

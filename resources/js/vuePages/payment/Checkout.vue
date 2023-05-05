@@ -138,28 +138,11 @@ function payment(){
                 bankToken.value= response.data.response.data.token;
                 payment_amount.value= response.data.response.data.payment_amount;
                 paymentConfirm.value = true;
-                // Swal.fire({
-                // title: 'تاییدیه نهایی پرداخت',
-                // text: `مبلغ پرداختی نهایی : ${response.data.response.data.payment_amount}`,
-                // showCancelButton: true,
-                // confirmButtonColor: '#3085d6',
-                // cancelButtonColor: '#d33',
-                // cancelButtonText: 'لغو',
-                // confirmButtonText: 'هدایت به صفحه پرداخت'
-                // }
-                // ).then((result) => {
-                //     if (result.isConfirmed) {
-                //         // const form = document.getElementById('gotoBankForm')
-                //         // form.addEventListener('submit', function(event) {
-                //         //     event.preventDefault();
-                //         // })
 
-                //     }
-                // })
 
             }
             if(response.data.code == 401){
-                Swal.fire(response.data.message)
+                Swal.fire(response.data.data.message)
             }
 
         })
@@ -195,7 +178,7 @@ function payment(){
         <p style="font-size : 18px"> قیمت : <span class="text-danger">{{product.info.price}} ریال </span></p>
 
         <div class="alert alert-danger" role="alert">
-            شماره کارت انتخابی شما با کارتی که توسط آن در درگاه بانک، پرداخت انجام میشود باید یکی باشد.
+            <strong> شماره کارت انتخابی</strong> شما باید با کارتی که توسط آن در درگاه بانک، پرداخت انجام میشود یکی باشد.
         </div>
         <p class="my-2">شماره کارت انتخابی شما : {{ selectedCart.info.number }}</p>
         <button v-if="!paymentConfirm" @click="payment" class="btn btn-danger">پرداخت</button>

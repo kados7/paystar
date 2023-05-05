@@ -64,7 +64,7 @@ class ProfileController extends Controller
         else{
             return [
                 'code' => 401,
-                'message'=> 'تا کنون کارتی ثبت نکرده اید',
+                'message'=> 'تا کنون محصولی خریداری نکرده اید',
             ];
         }
     }

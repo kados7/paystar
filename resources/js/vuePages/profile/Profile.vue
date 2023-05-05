@@ -120,7 +120,7 @@ getUserProducts();
 
 <template>
 
-<div class="container mt-4 p-4 border rounded-5">
+<div class="container mt-4 p-4 border rounded-5" style="background: #f3f3f3">
     <div class="row">
         <h1 class="mb-4">پروفایل</h1>
 

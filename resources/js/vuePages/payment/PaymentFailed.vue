@@ -47,12 +47,16 @@ function goToHome(){
             پرداخت ناموفق
         </h1>
         <div class="my-2">
+            <router-view></router-view>
+        </div>
+        <div class="my-2">
             <table class="table table-danger table-striped">
                 <thead>
                   <tr>
                     <th scope="col">شماره تراکنش </th>
                     <th scope="col">شماره فاکتور </th>
                     <th scope="col">شماره کارت انتخابی شما </th>
+                    <th scope="col">شماره کارتی که با آن تراکنش انجام داده اید </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -60,6 +64,7 @@ function goToHome(){
                     <td>{{transaction.transaction_id}}</td>
                     <td>{{transaction.receipt}}</td>
                     <td>{{ cart.number }}</td>
+                    <td dir="ltr" style="text-align:center">{{ transaction.card_number }}</td>
                   </tr>
                 </tbody>
               </table>

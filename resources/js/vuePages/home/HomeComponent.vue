@@ -26,7 +26,7 @@ getProducts()
 
 <template>
 
-<div class="container mt-4 p-4 border rounded-5">
+<div class="container mt-4 p-4 border rounded-5" style="background: #f3f3f3">
     <div class="row g-4">
         <!-- <h1>HomeComponent</h1> -->
         <router-view></router-view>

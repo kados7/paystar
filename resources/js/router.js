@@ -5,20 +5,27 @@ import ProductShow from './vuePages/home/ProductShow.vue';
 import Checkout from './vuePages/payment/Checkout.vue';
 import PaymentStatus from './vuePages/payment/PaymentStatus.vue';
 import PaymentFailed from './vuePages/payment/PaymentFailed.vue';
+import PaymentFailedCartNumber from './vuePages/payment/PaymentFailedCartNumber.vue';
 import PaymentSuccess from './vuePages/payment/PaymentSuccess.vue';
 import Profile from './vuePages/profile/Profile.vue';
 import Register from './vuePages/auth/Register.vue';
 import Login from './vuePages/auth/Login.vue';
 
 const routes = [
-    { path: '/',name:'home', component: HomeComponent , children:[
+    { path: '/',name:'home', component: HomeComponent
+    , children:[
         { path: '/',name:'home.product.index', component: ProductIndex },
         { path: 'product/:id',name:'home.product.show', component: ProductShow },
         { path: 'product/checkout/:id',name:'payment.checkout', component: Checkout , meta: { requiresAuth: true } },
     ]},
 
-    { path: '/payment', name:'payment', component: PaymentStatus , children:[
-        { path: 'transaction/:TransactionId/failed',name:'payment.failed', component: PaymentFailed},
+    { path: '/payment', name:'payment', component: PaymentStatus
+    , children:[
+
+        { path: 'transaction/:TransactionId/failed',name:'payment.failed', component: PaymentFailed
+        , children:[
+            { path: 'cartNumber',name:'payment.failed.cartNumber', component: PaymentFailedCartNumber },
+        ]},
         { path: 'transaction/:TransactionId/success',name:'payment.success', component: PaymentSuccess},
     ]},
 

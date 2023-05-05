@@ -77,9 +77,13 @@ Route::prefix('v1')->name('v1.')->group(function(){
 });
 
 Route::get('/test', function(Request $request){
-    $transaction = Transaction::where('ref_num','14w6v0')->first();
-    $user = $transaction->order->user;
-    $product=$transaction->order->product;
-    // dd($user , $product);
-        $user->products()->attach($product);
+    $number = "5894631161513734";
+    $cart_number ="589463******3734";
+    $cartWithStar = substr($number,0,6)."******".substr($number,12,4);
+    if($cart_number == $cartWithStar){
+        dd('yes',$cart_number, $cartWithStar);
+    }
+    else{
+        dd('no',$cart_number, $cartWithStar);
+    }
 });

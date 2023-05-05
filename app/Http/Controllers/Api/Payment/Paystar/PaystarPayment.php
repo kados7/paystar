@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api\Payment\Paystar;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\Payment\PaymentStrategy;
+use App\Http\Controllers\Api\Payment\Paystar\Transaction\IsCardNumberValid;
+use App\Http\Controllers\Api\Payment\Paystar\Transaction\IsFailed;
+use App\Http\Controllers\Api\Payment\Paystar\Transaction\IsSuccess;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Transaction;
@@ -74,55 +77,17 @@ class PaystarPayment implements PaymentStrategy
     public function callback($request){
         $transaction = Transaction::where('ref_num',$request->ref_num)->first();
         $receipt = $transaction->id.'.'.Carbon::now()->timestamp.'.'.$transaction->order->user_id;
+        //Chain of Responsibility - check Payment Situation
+        $isFailed = new IsFailed();
+        $isCartNumberValid = new IsCardNumberValid();
+        $isSuccess = new IsSuccess();
 
+        $isFailed->setNext($isCartNumberValid);
+        $isCartNumberValid->setNext($isSuccess);
 
-        $user_submit_cart_number = $transaction->order->cart->number;
-        $cartWithStar = substr( $user_submit_cart_number,0,6)."******".substr( $user_submit_cart_number,12,4);
-
-        if($request->status == 1 && $cartWithStar !== $request->card_number){
-
-            // dd($request->all(), $cartWithStar);
-            $transaction->update([
-                'ref_num' => $request->ref_num,
-                'pay_success' => true,
-                'transaction_id' => $request->transaction_id,
-                'card_number' => $request->card_number,
-                'tracking_code' => $request->tracking_code,
-                'receipt' => $receipt,
-                'verify' => false,
-            ]);
-            return redirect('/payment/transaction/'.$transaction->transaction_id.'/failed/cartNumber');
-
-        }
-        if($request->status == 1){
-
-            $transaction->update([
-                'ref_num' => $request->ref_num,
-                'pay_success' => true,
-                'transaction_id' => $request->transaction_id,
-                'card_number' => $request->card_number,
-                'tracking_code' => $request->tracking_code,
-                'receipt' => $receipt,
-            ]);
-
-            $verify_data = [
-                'amount' => $transaction->order->amount ,
-                'ref_num' => $transaction->ref_num ,
-                'card_number' => $transaction->card_number ,
-                'tracking_code' => $transaction->tracking_code,
-                'transaction_id' => $transaction->transaction_id
-            ];
-            return $this->verify($verify_data);
-        }
-        else{
-            $transaction->update([
-                'pay_success' => false,
-                'transaction_id' => $request->transaction_id,
-                'receipt' => $receipt,
-            ]);
-
-            return redirect('/payment/transaction/'.$transaction->transaction_id.'/failed');
-        }
+        // dd($isFailed->check($request,$transaction,$receipt)) ;
+        return $isFailed->check($request,$transaction,$receipt);
+        // dd($result);
     }
 
     function verify($verify_data) {

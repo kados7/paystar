@@ -124,7 +124,7 @@ function payment(){
             product_id : product.info.id,
             cart_id : selectedCart.info.id,
             price : product.info.price,
-            // payment_getway : 'paystar',
+            payment_gateway : 'paystar',
         }, {
             headers: {
             'Accept': 'application/json',

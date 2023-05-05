@@ -1,31 +1,29 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Payment\Paystar;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Api\Payment\PaymentStrategy;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Transaction;
-use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Redirect;
 
-class PaymentController extends Controller
+class PaystarPayment implements PaymentStrategy
 {
-    public $paystarCreateUrl = "https://core.paystar.ir/api/pardakht/create";
-    public $paystarVerifyUrl = "https://core.paystar.ir/api/pardakht/verify";
-    public $paystarGatewayId = "0yovdk2l6e143";
-    public $paystarSignKey = "9A3EC03483556C73714510C507529DF70A1228C83477D1455E0511BD72C5AAB8A6715A414AA48B7C905FCEF45868BD26DA58196EF29C77C194C9F14A4B47456CC6454E9D50B388D6FC5AC91BB08B234A8060FDC85B1CEC32CA036DC907F8A4A635D9CBB9CAA31B42549B8D70B2CE5EDE8274FFB55DABFE92D76BC42D91696FAF";
+    private $paystarCreateUrl = "https://core.paystar.ir/api/pardakht/create";
+    private $paystarVerifyUrl = "https://core.paystar.ir/api/pardakht/verify";
+    private $paystarGatewayId = "0yovdk2l6e143";
+    private $paystarSignKey = "9A3EC03483556C73714510C507529DF70A1228C83477D1455E0511BD72C5AAB8A6715A414AA48B7C905FCEF45868BD26DA58196EF29C77C194C9F14A4B47456CC6454E9D50B388D6FC5AC91BB08B234A8060FDC85B1CEC32CA036DC907F8A4A635D9CBB9CAA31B42549B8D70B2CE5EDE8274FFB55DABFE92D76BC42D91696FAF";
 
-    public function goToPayment(Request $request){
+    public function create(Request $request){
 
         $order =Order::create([
             'user_id' => $request->user()->id,
             'product_id' =>$request->product_id,
             'cart_id' =>$request->cart_id,
-            'payment_getway' =>$request->payment_getway,
+            'payment_gateway' =>$request->payment_gateway,
             // 'price' =>$request->price,
         ]);
 
@@ -73,7 +71,7 @@ class PaymentController extends Controller
     }
 
 
-    public function callbackPaystar(Request $request){
+    public function callback(Request $request){
         $transaction = Transaction::where('ref_num',$request->ref_num)->first();
         $receipt = $transaction->id.'.'.Carbon::now()->timestamp.'.'.$transaction->order->user_id;
 

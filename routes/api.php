@@ -3,13 +3,12 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Home\ProductController;
 use App\Http\Controllers\Api\Home\ProfileController;
-use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\TransactionController;
+use App\Models\Order;
 use App\Models\Transaction;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Laravel\Passport\TokenRepository;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,8 +41,8 @@ Route::prefix('v1')->name('v1.')->group(function(){
     Route::post('/addUserCart', [ProfileController::class , 'addUserCart'])->middleware('auth:api');
     Route::post('/getUserProducts', [ProfileController::class , 'getUserProducts'])->middleware('auth:api');
 
-    Route::post('/goToPayment', [PaymentController::class , 'goToPayment'])->middleware('auth:api');
-    Route::post('/paystare/callback', [PaymentController::class , 'callbackPaystar'])->name('paystar.callback');
+    Route::post('/goToPayment', [PaymentController::class , 'startPayment'])->middleware('auth:api');
+    Route::post('/paystare/callback', [PaymentController::class , 'paymentCallback'])->name('paystar.callback');
     Route::get('/transaction/{transaction:transaction_id}', [TransactionController::class , 'show'])->name('transaction.show');
 
     // Route::get('/courses/{course:id}', [CourseController::class , 'show']);
@@ -77,13 +76,5 @@ Route::prefix('v1')->name('v1.')->group(function(){
 });
 
 Route::get('/test', function(Request $request){
-    $number = "5894631161513734";
-    $cart_number ="589463******3734";
-    $cartWithStar = substr($number,0,6)."******".substr($number,12,4);
-    if($cart_number == $cartWithStar){
-        dd('yes',$cart_number, $cartWithStar);
-    }
-    else{
-        dd('no',$cart_number, $cartWithStar);
-    }
+
 });

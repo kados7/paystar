@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Redirect;
 
 class PaymentController extends Controller
 {
-    public $paymentCreateUrl = "https://core.paystar.ir/api/pardakht/create";
-    public $paymentVerifyUrl = "https://core.paystar.ir/api/pardakht/verify";
-    public $gatewayId = "0yovdk2l6e143";
-    public $signKey = "9A3EC03483556C73714510C507529DF70A1228C83477D1455E0511BD72C5AAB8A6715A414AA48B7C905FCEF45868BD26DA58196EF29C77C194C9F14A4B47456CC6454E9D50B388D6FC5AC91BB08B234A8060FDC85B1CEC32CA036DC907F8A4A635D9CBB9CAA31B42549B8D70B2CE5EDE8274FFB55DABFE92D76BC42D91696FAF";
+    public $paystarCreateUrl = "https://core.paystar.ir/api/pardakht/create";
+    public $paystarVerifyUrl = "https://core.paystar.ir/api/pardakht/verify";
+    public $paystarGatewayId = "0yovdk2l6e143";
+    public $paystarSignKey = "9A3EC03483556C73714510C507529DF70A1228C83477D1455E0511BD72C5AAB8A6715A414AA48B7C905FCEF45868BD26DA58196EF29C77C194C9F14A4B47456CC6454E9D50B388D6FC5AC91BB08B234A8060FDC85B1CEC32CA036DC907F8A4A635D9CBB9CAA31B42549B8D70B2CE5EDE8274FFB55DABFE92D76BC42D91696FAF";
 
     public function goToPayment(Request $request){
 
@@ -25,18 +25,19 @@ class PaymentController extends Controller
             'user_id' => $request->user()->id,
             'product_id' =>$request->product_id,
             'cart_id' =>$request->cart_id,
+            'payment_getway' =>$request->payment_getway,
             // 'price' =>$request->price,
         ]);
 
         $signData=$request->price."#".$order->id."#".route('v1.paystar.callback');
-        $sign =hash_hmac('SHA512',$signData,$this->signKey,false);
+        $sign =hash_hmac('SHA512',$signData,$this->paystarSignKey,false);
         // $cart_number = Cart::find($request->cart_id)->number;
 
         $cart = Cart::find($request->cart_id);
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-            'Authorization' => 'Bearer '.$this->gatewayId,
-        ])->post( $this->paymentCreateUrl , [
+            'Authorization' => 'Bearer '.$this->paystarGatewayId,
+        ])->post( $this->paystarCreateUrl , [
             'amount' => $request->price,
             'order_id' => $order->id,
             'callback' => route('v1.paystar.callback'),
@@ -126,12 +127,12 @@ class PaymentController extends Controller
         // amount#ref_num#card_number#tracking_code
         $signData=$amount."#".$ref_num."#".$card_number."#".$tracking_code;
 
-        $sign =hash_hmac('SHA512',$signData,$this->signKey,false);
+        $sign =hash_hmac('SHA512',$signData,$this->paystarSignKey,false);
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-            'Authorization' => 'Bearer '.$this->gatewayId,
-        ])->post( $this->paymentVerifyUrl , [
+            'Authorization' => 'Bearer '.$this->paystarGatewayId,
+        ])->post( $this->paystarVerifyUrl , [
             'ref_num' => $ref_num,
             'amount' => $amount,
             'sign' => $sign,

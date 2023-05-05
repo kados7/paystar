@@ -124,6 +124,7 @@ function payment(){
             product_id : product.info.id,
             cart_id : selectedCart.info.id,
             price : product.info.price,
+            // payment_getway : 'paystar',
         }, {
             headers: {
             'Accept': 'application/json',
@@ -133,8 +134,9 @@ function payment(){
         })
         .then(function (response) {
             // handle success
+            console.log(response.data)
+
             if(response.data.code == 200){
-                console.log(response.data)
                 bankToken.value= response.data.response.data.token;
                 payment_amount.value= response.data.response.data.payment_amount;
                 paymentConfirm.value = true;
@@ -180,7 +182,28 @@ function payment(){
         <div class="alert alert-danger" role="alert">
             <strong> شماره کارت انتخابی</strong> شما باید با کارتی که توسط آن در درگاه بانک، پرداخت انجام میشود یکی باشد.
         </div>
-        <p class="my-2">شماره کارت انتخابی شما : {{ selectedCart.info.number }}</p>
+        <strong class="my-2">
+            <span v-if="selectedCart.info.number">☑️</span>
+            <span>شماره کارت انتخابی شما : </span>
+            <span class="text-primary"> {{ selectedCart.info.number }}</span>
+        </strong>
+
+        <p class="mt-5 h5"> درگاه پرداخت :</p>
+        <div class="col-md-6 my-4 border p-2">
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioDisabled" checked>
+                <label class="form-check-label" for="flexRadioDisabled">
+                  درگاه پرداخت پی استار
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" disabled>
+                <label class="form-check-label" for="flexRadioCheckedDisabled">
+                    درگاه پرداخت بانک ملی
+                </label>
+              </div>
+        </div>
         <button v-if="!paymentConfirm" @click="payment" class="btn btn-danger">پرداخت</button>
         <form class="border p-2" v-else id="gotoBankForm" action="https://core.paystar.ir/api/pardakht/payment" method="post">
             <input name="token" type="hidden" :value="bankToken" >
@@ -198,7 +221,7 @@ function payment(){
         <table class="table table-info table-striped">
             <thead>
                 <tr>
-                <th scope="col">#</th>
+                <th scope="col">انتخاب</th>
                 <th scope="col">شماره کارت</th>
                 <th scope="col">بانک</th>
                 </tr>

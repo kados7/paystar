@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('CASCADE');
             $table->foreignId('cart_id')->constrained()->onDelete('CASCADE');
             $table->foreignId('product_id')->constrained()->onDelete('CASCADE');
+            $table->string('payment_getway')->nullable();
             $table->integer('amount')->nullable();
             $table->timestamps();
         });

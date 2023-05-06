@@ -1,10 +1,10 @@
-#### **برای احراز هویت از لاراول پاسپورت استفاده شده است**
+#### **برای احراز هویت از لاراول پاسپورت استفاده شده است . حتما passport:install انجام شود.**
 
 ### برای استفاده :
 
     // Some comments
     php artisan migrate
-    **php artisan passport:install**
+    php artisan passport:install
     php artisan db:seeds
 ---
 

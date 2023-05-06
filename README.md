@@ -7,7 +7,7 @@
 - 3- php artisan db:seed
 
 
-## Featurs
+## ویژگی های به کار رفته
 - Front = VueJs and Pinia
 - Laravel Test
 - Design Pattern (strategy , chain of responsibility)

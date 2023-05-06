@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\User;
@@ -18,20 +19,11 @@ class TransactionTest extends TestCase
         return new Transaction();
     }
 
-    public function test_transaction_has_relation_with_user_belongsto(){
+    public function test_transaction_has_relation_with_order_belongsto(){
 
-        $transaction= Transaction::factory()->for(User::factory())->create();
+        $transaction= Transaction::factory()->for(Order::factory())->create();
 
-        $this->assertTrue(isset($transaction->user->id));
-        $this->assertTrue($transaction->user instanceof User);
-    }
-
-
-    public function test_transaction_has_relation_with_product_belongsto(){
-
-        $transaction= Transaction::factory()->for(Product::factory())->create();
-
-        $this->assertTrue(isset($transaction->product->id));
-        $this->assertTrue($transaction->product instanceof Product);
+        $this->assertTrue(isset($transaction->order->id));
+        $this->assertTrue($transaction->order instanceof Order);
     }
 }

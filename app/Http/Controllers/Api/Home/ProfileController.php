@@ -26,7 +26,6 @@ class ProfileController extends Controller
 
     public function addUserCart(Request $request){
 
-        // return 'sss';
         if($request->user()->id){
 
             $validator= Validator($request->all(),[

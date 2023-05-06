@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 
@@ -18,9 +19,10 @@ class CartFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id'=> User::factory(),
             'number'=> $this->faker->creditCardNumber(),
             'name'=> $this->faker->name,
-            'bank'=> $this->faker->name,
+            'bank'=> Arr::random(['ملی','ملت','صادرات','آینده','مسکن']),
             // Arr::random('ملی','ملت','صادرات','آینده','مسکن'),
         ];
     }

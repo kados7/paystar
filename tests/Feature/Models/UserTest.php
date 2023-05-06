@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\User;
@@ -26,12 +27,12 @@ class UserTest extends TestCase
         $this->assertTrue($user->products->first() instanceof Product);
     }
 
-    public function test_user_has_relation_with_transaction_hasmany(){
+    public function test_user_has_relation_with_order_hasmany(){
         $count=rand(1,5);
-        $user= User::factory()->hasTransactions($count)->create();
+        $user= User::factory()->hasOrders($count)->create();
 
-        $this->assertCount($count,$user->transactions);
-        $this->assertTrue($user->transactions->first() instanceof Transaction);
+        $this->assertCount($count,$user->orders);
+        $this->assertTrue($user->orders->first() instanceof Order);
     }
 
 }

@@ -64,7 +64,8 @@ class AuthController extends Controller
 
         }
 
-        if(Hash::check($user->password , $request->password)){
+        if(!Hash::check($request->password , $user->password ) ){
+            // dd('noo');
             return [
                 'code' => 401,
                 'message' => 'پسورد اشتباه است.' ,
@@ -72,7 +73,6 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('paystore')->accessToken;
-
         return [
             'code' => 200,
             'user' => $user,
@@ -86,7 +86,10 @@ class AuthController extends Controller
         $request->user()->token()->delete();
         // auth()->user()->token()->delete();
 
-        return 'ok';
+        return [
+            'code'=> 200,
+            'message' => 'user successfully loggedout'
+        ];
 
     }
 
@@ -95,10 +98,4 @@ class AuthController extends Controller
         return 'user is loggedin';
     }
 
-    public function me(Request $request)
-    {
-        $user = $request->user();
-
-        return response()->json(['user' => $user], 200);
-    }
 }

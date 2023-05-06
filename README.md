@@ -5,7 +5,7 @@
     // Some comments
     php artisan migrate
     php artisan passport:install
-    php artisan db:seeds
+    php artisan db:seed
 ---
 
 ### ویژگی های به کار رفته

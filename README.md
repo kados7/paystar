@@ -1,13 +1,12 @@
-## نحوه استفاده 
-#برای احراز هویت از لاراول پاسپورت استفاده شده است
+#### **برای احراز هویت از لاراول پاسپورت استفاده شده است**
 
-برای استفاده :
+### برای استفاده :
+::: warning
 - 1- php artisan migrate
 - 2- php artisan passport:install
-- 3- php artisan db:seed
+- 3- php artisan db:seed:::
 
-
-## ویژگی های به کار رفته
+### ویژگی های به کار رفته
 - Front = VueJs and Pinia
 - Laravel Test
 - Design Pattern (strategy , chain of responsibility)

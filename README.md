@@ -2,13 +2,11 @@
 
 ### برای استفاده :
 
-    // Some comments
     php artisan migrate
     php artisan passport:install
     php artisan db:seed
     
 ### در فایل env مقادیر زیر مشخص شود :
-    // Some comments
     PAYSTAR_CREATE_URL = "https://core.paystar.ir/api/pardakht/create"
     PAYSTAR_VERIFY_URL = "https://core.paystar.ir/api/pardakht/verify"
     PAYSTAR_GATEWAY_ID = "***********"

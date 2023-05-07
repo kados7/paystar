@@ -18,7 +18,7 @@
 - Front = VueJs and Pinia
 - Laravel Test
 - Design Pattern (strategy , chain of responsibility)
-- Laravel Passport Authentication
+- Laravel Passport Authentication (JWT)
 
 
 

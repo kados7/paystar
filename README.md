@@ -14,7 +14,9 @@
 
 ---
 
-### ویژگی های به کار رفته
+### 
+ویژگی های به کار رفته
+- Laravel API
 - Front = VueJs and Pinia
 - Laravel Test
 - Design Pattern (strategy , chain of responsibility)
